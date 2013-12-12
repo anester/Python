@@ -1,63 +1,127 @@
 import sys
-#from tkinter import *
-import tkinter as TK
+from tkinter import *
+from tkinter.ttk import *
 from datetime import date, datetime
 from DbHelpers import DbMngr
 from TkHelpers import SimpleListBox, ScrollableMessage, buildForm
 import shelve
 from DDObjects import *
 
-class EquipmentWindow(TK.Toplevel):
+class EquipmentWindow(Toplevel):
     """Manage Equipment from this window"""
     
     def __init__(self, value, *args, **kwargs):
-        TK.Toplevel.__init__(self, *args, **kwargs)
+        Toplevel.__init__(self, *args, **kwargs)
 
-        rightFrame = TK.Frame(self)
-        leftFrame = TK.Frame(self)
+        rightFrame = Frame(self)
+        leftFrame = Frame(self)
+        bottomFrame = Frame(rightFrame)
+
+        nextBtn = Button(bottomFrame, text="N")
+        prevBtn = Button(bottomFrame, text="P")
+        updateBtn = Button(bottomFrame, text="U")
+        addBtn = Button(bottomFrame, text="A")
+
+        self.bind('<Control a>', lambda e: self.__addnew__())
+        self.bind('<Control c>', lambda e: self.__clear__())
+
         equipmentLstBx = SimpleListBox(leftFrame)
+        equipmentLstBx.listbox.configure(width=100, height=45)
 
         self.rightFrame = rightFrame
         self.leftFrame = leftFrame
+        self.bottomFrame = bottomFrame
 
         self.armor = value
-        self.label = TK.Label(self, text="Equipment Window")
-        self.label.pack(side=TK.TOP, fill=TK.X);
+        self.label = Label(self, text="Equipment Window")
+        self.label.pack(side=TOP, fill=X)
 
-        self.formvalues = buildForm(rightFrame, [('Name',''),
-                                           ('Set Type', ''),
-                                           ('Type', ''),
-                                           ('Kind', ''),
-                                           ('Level', 1),
-                                           ('Max Level', 99),
-                                           ('Cost', 0),
-                                           ('Hero Health',0),
-                                           ('Hero Damage',0),
-                                           ('Hero Speed',0),
-                                           ('Hero Casting',0),
-                                           ('Hero Special 1',0),
-                                           ('Hero Special 2',0),
-                                           ('Defense Health',0),
-                                           ('Defense Damage',0),
-                                           ('Defense Area Effect',0),
-                                           ('Defense Attack Rate',0),
-                                           ('Resistance Generic',0),
-                                           ('Resistance Fire',0),
-                                           ('Resistance Electric',0),
-                                           ('Resistance Poison',0)], 
-                                    labelWidth=30)
+        self.nextBtn = nextBtn
+        self.prevBtn = prevBtn
+        self.updateBtn = updateBtn
+        self.addBtn = addBtn
+
+        self.formvalues, self.entries = buildForm(
+            rightFrame, [
+                ('Name',''),
+                ('Set Type', 'Mythical', ('Mythical', 'Transcendent', 'Supreme', 'Ultimate')),
+                ('Type', 'Leather', ('Leather','Mail','Chain','Plate','Pristine')),
+                ('Kind', 'Helm', ('Helm','Chest','Gloves','Boots')),
+                ('Level', 1),
+                ('Max Level', 99),
+                ('Cost', 0),
+                ('Hero Health',0),
+                ('Hero Damage',0),
+                ('Hero Speed',0),
+                ('Hero Casting',0),
+                ('Hero Special 1',0),
+                ('Hero Special 2',0),
+                ('Defense Health',0),
+                ('Defense Damage',0),
+                ('Defense Area Effect',0),
+                ('Defense Attack Rate',0),
+                ('Resistance Generic',0),
+                ('Resistance Fire',0),
+                ('Resistance Electric',0),
+                ('Resistance Poison',0)
+            ], 
+            labelWidth=30,
+            fieldWidth=50
+        )
+
         for k in self.formvalues.keys():
             val = self.formvalues[k]
             val.trace('w', lambda a,b,c,d=k: self.valueChanged(d))
 
-        self.setValues(value)
+        nextBtn.pack(side=RIGHT)
+        prevBtn.pack(side=RIGHT)
+        updateBtn.pack(side=RIGHT)
+        addBtn.pack(side=RIGHT)
 
-        rightFrame.pack(side=TK.RIGHT, expand=True, fill=TK.BOTH)
-        leftFrame.pack(side=TK.LEFT, expand=True, fill=TK.BOTH)
+        self.setValues(value)
+        bottomFrame.pack(side=TOP, expand=NO, fill=X)
+        rightFrame.pack(side=RIGHT, expand=NO, fill=BOTH)
+        leftFrame.pack(side=LEFT, expand=YES, fill=BOTH)
+
+    def __focusfirst__(self):
+        ''''''
+        self.entries['Name'].focus()
+
+    def __clear__(self):
+        ''''''
+        self.setValues({'Name':a.name,
+                'Set Type':a.armorsettype,
+                'Type':a.armortype,
+                'Kind':a.armorkind,
+                'Level':a.armorlevel,
+                'Max Level':a.armormaxlevel,
+                'Cost':a.cost,
+                'Hero Health':a.herohealth,
+                'Hero Damage':a.herodamage,
+                'Hero Speed':a.herospeed,
+                'Hero Casting':a.herocastingrate,
+                'Hero Special 1':a.herospecial1,
+                'Hero Special 2':a.herospecial2,
+                'Defense Health':a.defensehealth,
+                'Defense Damage':a.defensedamage,
+                'Defense Area Effect':a.defenseareaeffect,
+                'Defense Attack Rate':a.defenseattackrate,
+                'Resistance Generic':a.resistgeneric,
+                'Resistance Fire':a.resistfire,
+                'Resistance Electric':a.resisteletric,
+                'Resistance Poison':a.resistpoison
+                })
+
+    def __addnew__(self):
+        """"""
+        vals = list([(k, self.formvalues[k].get()) for k in self.formvalues])
+        self.vals = vals
+        self.event_generate('<<addnew>>')
+
+        self.__focusfirst__()
 
     def valueChanged(self, name):
         """"""
-
         if name == 'Name':
             self.armor.name = self.formvalues[name].get()
         elif name == 'Set Type':
@@ -132,21 +196,21 @@ class EquipmentWindow(TK.Toplevel):
                             })
 
 
-class HeroWindow(TK.Toplevel):
+class HeroWindow(Toplevel):
     """Manage Heros from this window"""
 
     def __init__(self, *args, **kwargs):
-        TK.Toplevel.__init__(self, *args, **kwargs)
+        Toplevel.__init__(self, *args, **kwargs)
         self.title('Hero Manager')
 
-        self.label = TK.Label(self, text="Hero Window")
-        self.label.pack();
+        self.label = Label(self, text="Hero Window")
+        self.label.pack()
 
-class DDApp(TK.Tk):
+class DDApp(Tk):
     """Top Level app"""
 
     def __init__(self, *args, **kwargs):
-        TK.Tk.__init__(self, *args, **kwargs)
+        Tk.__init__(self, *args, **kwargs)
 
         self.protocol('WM_DELETE_WINDOW', lambda: self.onExit())
 
@@ -159,15 +223,15 @@ class DDApp(TK.Tk):
         if 'heroes' in self.library.keys():
             self.heroes = self.library['heroes']
 
-        #mf = TK.Frame(self)
-        heroBtn = TK.Button(self, text="Hero Mngr", command=self.launchHeroMngr)
-        equipmentBtn = TK.Button(self, text="Equipment Mngr", command=self.launchEquipMngr)
+        #mf = Frame(self)
+        heroBtn = Button(self, text="Hero Mngr", command=self.launchHeroMngr)
+        equipmentBtn = Button(self, text="Equipment Mngr", command=self.launchEquipMngr)
 
-        heroBtn.pack(side=TK.LEFT)
-        equipmentBtn.pack(side=TK.LEFT)
+        heroBtn.pack(side=LEFT)
+        equipmentBtn.pack(side=LEFT)
         #mf.pack()
 
-        self.heroBtn= heroBtn
+        self.heroBtn = heroBtn
         self.equipmentBtn = equipmentBtn
         #self.mainFrame = mf
 
@@ -177,13 +241,20 @@ class DDApp(TK.Tk):
         self.library['heroes'] = self.heroes
 
         self.library.close()
+        self.destroy()
 
     def launchEquipMngr(self):
         a = Armor('',0)
         self.equipWin = EquipmentWindow(a)
+        self.equipWin.bind('<<addnew>>', self.addequipment)
 
     def launchHeroMngr(self):
         self.win = HeroWindow(self)
+
+    def addequipment(self, e, b=None):
+        ''''''
+        vals = e.widget.vals
+        print('Hello World')
 
 if __name__ == '__main__':
     app = DDApp()

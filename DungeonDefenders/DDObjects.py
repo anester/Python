@@ -10,6 +10,7 @@ class Entity:
         self.herodamage = 0
         self.herospeed = 0
         self.herocastingrate = 0
+
         self.herospecial1 = 0
         self.herospecial2 = 0
 

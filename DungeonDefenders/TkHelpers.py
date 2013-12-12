@@ -1,5 +1,6 @@
 import sys
-import tkinter as TK
+from tkinter import *
+from tkinter.ttk import *
 
 class SimpleListBox:
     """"""
@@ -7,23 +8,23 @@ class SimpleListBox:
     def __init__(self, frame):
         """"""
         self.root = frame
-        self.listbox = TK.Listbox(frame, relief=TK.SUNKEN, exportselection=False)
-        self.vbar = TK.Scrollbar(frame, command=self.listbox.yview)
-        self.hbar = TK.Scrollbar(frame, orient=TK.HORIZONTAL,  command=self.listbox.xview)
+        self.listbox = Listbox(frame, relief=SUNKEN, exportselection=False)
+        self.vbar = Scrollbar(frame, command=self.listbox.yview)
+        self.hbar = Scrollbar(frame, orient=HORIZONTAL,  command=self.listbox.xview)
         self.listbox.config(yscrollcommand=self.vbar.set, xscrollcommand=self.hbar.set)
 
-        self.vbar.pack(side=TK.RIGHT, fill=TK.Y)
-        self.hbar.pack(side=TK.BOTTOM, fill=TK.X)
-        self.listbox.pack(side=TK.LEFT, expand=TK.YES, fill=TK.BOTH)
+        self.vbar.pack(side=RIGHT, fill=Y)
+        self.hbar.pack(side=BOTTOM, fill=X)
+        self.listbox.pack(side=LEFT, expand=YES, fill=BOTH)
 
     def GetSelection(self):
-        return self.listbox.get(TK.ACTIVE)
+        return self.listbox.get(ACTIVE)
 
     def Clear(self):
-        self.listbox.delete(0, TK.END)
+        self.listbox.delete(0, END)
         
     def Append(self, itm):
-        self.listbox.insert(TK.END, itm)
+        self.listbox.insert(END, itm)
     
     def Fill(self, arr):
         self.Clear()
@@ -39,20 +40,20 @@ class ScrollableMessage:
     def __init__(self, frame):
         """"""
         self.root = frame
-        self.msg = TK.Text(self.root, relief=TK.SUNKEN, background='white')
-        self.vbar = TK.Scrollbar(frame, command=self.msg.yview)
+        self.msg = Text(self.root, relief=SUNKEN, background='white')
+        self.vbar = Scrollbar(frame, command=self.msg.yview)
         self.msg.config(yscrollcommand=self.vbar.set) #, xscrollcommand=self.hbar.set)
 
-        self.vbar.pack(side=TK.RIGHT, fill=TK.Y)
-        #self.hbar.pack(side=TK.BOTTOM, fill=TK.X)
-        self.msg.pack(side=TK.LEFT, expand=TK.YES, fill=TK.BOTH)
+        self.vbar.pack(side=RIGHT, fill=Y)
+        #self.hbar.pack(side=BOTTOM, fill=X)
+        self.msg.pack(side=LEFT, expand=YES, fill=BOTH)
 
     def OverWrite(self, text):
-        self.msg.delete('1.0', TK.END)
+        self.msg.delete('1.0', END)
         self.msg.insert('1.0', text)
 
     def Append(self, text):
-        self.msg.insert(TK.END, text)
+        self.msg.insert(END, text)
 
     def Write(self, text):
         self.msg.insert('1.0', text)
@@ -60,29 +61,43 @@ class ScrollableMessage:
     def Puts(self, text):
         self.msg.insert('1.0', text + "\n")
 
-def buildForm(widget, fieldarr, labelWidth=15):
+def buildForm(widget, fieldarr, labelWidth=15, fieldWidth=25):
     valueDict = {}
     entries = {}
     
     for tple in fieldarr:
         if len(tple) == 2:
-            value = TK.StringVar(value=tple[1])
+            value = StringVar(value=tple[1])
             key = tple[0]
             valueDict[key] = value
         
-            row = TK.Frame(widget)
-            label = TK.Label(row, text=key, width=labelWidth)
-            ent = TK.Entry(row, text=value)
-            row.pack(side=TK.TOP, fill=TK.X)
-            label.pack(side=TK.LEFT)
-            ent.pack(side=TK.RIGHT, expand=TK.YES, fill=TK.X)
+            row = Frame(widget)
+            label = Label(row, text=key, width=labelWidth)
+            ent = Entry(row, text=value, width=fieldWidth)
+            row.pack(side=TOP, fill=X, expand=NO)
+            label.pack(side=LEFT)
+            ent.pack(side=RIGHT, expand=NO, fill=X)
             entries[key] = ent
+
+        elif len(tple) == 3:
+            value = StringVar(value=tple[1])
+            key = tple[0]
+            valueDict[key] = value
+            
+            row = Frame(widget)
+            label = Label(row, text=key, width=labelWidth)
+            ent = Combobox(row, textvariable=value, values=tple[2], width=fieldWidth, state = 'readonly')
+            row.pack(side=TOP, fill=X, expand=NO)
+            label.pack(side=LEFT)
+            ent.pack(side=RIGHT, expand=NO, fill=X)
+            entries[key] = ent
+
         elif len(tple) == 1:
             key = tple[0]
-            row = TK.Frame(widget)
-            label = TK.Label(row, text=key)
-            row.pack(side=TK.TOP, fill=TK.X)
-            label.pack(side=TK.TOP, fill=TK.BOTH, expand=True)
+            row = Frame(widget)
+            label = Label(row, text=key)
+            row.pack(side=TOP, fill=X)
+            label.pack(side=TOP, fill=BOTH, expand=True)
             
 
-    return valueDict
+    return (valueDict, entries)

@@ -6,12 +6,15 @@ from DbHelpers import DbMngr
 from TkHelpers import SimpleListBox, ScrollableMessage, buildForm
 import shelve
 from DDObjects import *
+from DDData import *
 
 class EquipmentWindow(Toplevel):
     """Manage Equipment from this window"""
     
     def __init__(self, value, *args, **kwargs):
         Toplevel.__init__(self, *args, **kwargs)
+
+        self.db = DDDb('dundef.db')
 
         rightFrame = Frame(self)
         leftFrame = Frame(self)
@@ -171,7 +174,7 @@ class EquipmentWindow(Toplevel):
                 self.formvalues[k].set(values[k])
 
         elif values is Armor:
-            a = Armor('',0)
+            a = Armor()
             self.setValues({'Name':a.name,
                             'Set Type':a.armorsettype,
                             'Type':a.armortype,
@@ -244,7 +247,7 @@ class DDApp(Tk):
         self.destroy()
 
     def launchEquipMngr(self):
-        a = Armor('',0)
+        a = Armor()
         self.equipWin = EquipmentWindow(a)
         self.equipWin.bind('<<addnew>>', self.addequipment)
 
@@ -253,8 +256,39 @@ class DDApp(Tk):
 
     def addequipment(self, e, b=None):
         ''''''
-        vals = e.widget.vals
-        print('Hello World')
+        vals = dict(e.widget.vals)
+        d = {}
+        
+        d['Stats_Value'] = vals['Cost']
+        d['Stats_Level'] = vals['Level']
+        d['Stats_Max_Level'] = vals['Max Level']
+
+        d['Stats_Hero_Health'] = vals['Hero Health']
+        d['Stats_Hero_Damage'] = vals['Hero Damage']
+        d['Stats_Hero_Speed'] = vals['Hero Speed']
+        d['Stats_Hero_Casting_Rate'] = vals['Hero Casting']
+
+        d['Stats_Hero_Special1'] = vals['Hero Special 1']
+        d['Stats_Hero_Special2'] = vals['Hero Special 2']
+
+        d['Stats_Defense_Health'] = vals['Defense Health']
+        d['Stats_Defense_Damage'] = vals['Defense Damage']
+        d['Stats_Defense_Area_Effect'] = vals['Defense Area Effect']
+        d['Stats_Defense_Attack_Rate'] = vals['Defense Attack Rate']
+
+        d['Stats_Armor_Resist_Base'] = vals['Resistance Generic']
+        d['Stats_Armor_Resist_Fire'] = vals['Resistance Fire']
+        d['Stats_Armor_Resist_Electric'] = vals['Resistance Electric']
+        d['Stats_Armor_Resist_Poison'] = vals['Resistance Poison']
+
+        d['Armor_Name'] = vals['Name']
+        d['Armor_Quality'] = vals['Set Type']
+        d['Armor_Type'] = vals['Type']
+        d['Armor_Kind'] = vals['Kind']
+
+        print(vals)
+        print('\n'.join(["d['{0}'] = vals['{1}']".format('', f[0]) for f in e.widget.vals]))
+        
 
 if __name__ == '__main__':
     app = DDApp()

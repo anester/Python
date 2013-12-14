@@ -10,6 +10,7 @@ DDQUERIES = {
             '''CREATE TABLE IF NOT EXISTS Stats (
                 Stats_ID INTEGER PRIMARY KEY AUTOINCREMENT,
 
+                Stats_Value INTEGER,
                 Stats_Level INTEGER,
                 Stats_Max_Level INTEGER,
 
@@ -41,7 +42,11 @@ DDQUERIES = {
             '''CREATE TABLE IF NOT EXISTS Armor(
                 Armor_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 Stats_ID INTEGER,
-                Armor_Name TEXT
+                Armor_Name TEXT,
+
+                Armor_Quality TEXT,
+                Armor_Type TEXT,
+                Armor_Kind TEXT
             );''',
             '''CREATE TABLE IF NOT EXISTS ArmorSet(
                 ArmorSet_ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -56,7 +61,8 @@ DDQUERIES = {
     },
     'modifydb': {
         'insert': {
-            'Stats':'''INSERT INTO Stats(Stats_Level,
+            'Stats':'''INSERT INTO Stats(Stats_Value,
+                                    Stats_Level,
                                     Stats_Max_Level,
                                     Stats_Hero_Health,
                                     Stats_Hero_Damage,
@@ -72,9 +78,15 @@ DDQUERIES = {
                                     Stats_Armor_Resist_Fire,
                                     Stats_Armor_Resist_Electric,
                                     Stats_Armor_Resist_Poison) 
-                       VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);''',
+                       VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);''',
             'Hero':'INSERT INTO Hero(Stats_ID, ArmorSet_ID, Hero_Name) VALUES(?,?,?);',
-            'Armor':'INSERT INTO Armor(Stats_ID, Armor_Name) VALUES(?,?,?);',
+            'Armor':'''INSERT INTO
+                       Armor(Stats_ID,
+                             Armor_Name,
+                             Armor_Quality,
+                             Armor_Type,
+                             Armor_Kind)
+                       VALUES(?,?,?,?,?);''',
             'ArmorSet':'''INSERT INTO ArmorSet(ArmorSet_Name,
                                             ArmorSet_Helm_ID, 
                                             ArmorSet_Chest_ID, 
@@ -84,7 +96,8 @@ DDQUERIES = {
         },
         'update': {
             'Stats':'''UPDATE Stats
-                       SET Stats_Level = ?,
+                       SET Stats_Value = ?
+                           Stats_Level = ?,
                            Stats_Max_Level = ?,
                            Stats_Hero_Health = ?,
                            Stats_Hero_Damage = ?,

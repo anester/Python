@@ -13,9 +13,6 @@ class EquipmentWindow(Toplevel):
     
     def __init__(self, value, *args, **kwargs):
         Toplevel.__init__(self, *args, **kwargs)
-
-        self.db = DDDb('dundef.db')
-
         rightFrame = Frame(self)
         leftFrame = Frame(self)
         bottomFrame = Frame(rightFrame)
@@ -215,6 +212,7 @@ class DDApp(Tk):
     def __init__(self, *args, **kwargs):
         Tk.__init__(self, *args, **kwargs)
 
+        self.db = DDDb('dundef.db')
         self.protocol('WM_DELETE_WINDOW', lambda: self.onExit())
 
         self.library = shelve.open('DDLibrary', 'c')
@@ -286,9 +284,8 @@ class DDApp(Tk):
         d['Armor_Type'] = vals['Type']
         d['Armor_Kind'] = vals['Kind']
 
-        print(vals)
-        print('\n'.join(["d['{0}'] = vals['{1}']".format('', f[0]) for f in e.widget.vals]))
-        
+        self.db.insert_armor(d)
+                
 
 if __name__ == '__main__':
     app = DDApp()
